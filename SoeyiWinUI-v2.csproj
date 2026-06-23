@@ -130,5 +130,10 @@
 
   <Target Name="CopyNativeDlls" AfterTargets="Build">
     <Copy SourceFiles="NativeDlls\x64\MSDISPLAYSDKWRRAPER.dll;NativeDlls\x64\AicUsbDisplay.dll;NativeDlls\x64\cpuidsdk.dll;NativeDlls\x64\libusb0.dll;NativeDlls\x64\HidSharp.dll;NativeDlls\x64\DiskInfoToolkit.dll;NativeDlls\x64\RAMSPDToolkit-NDD.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+    <!-- USB display driver installer files -->
+    <ItemGroup>
+      <_LibusbFiles Include="libusb\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_LibusbFiles)" DestinationFolder="$(OutputPath)\libusb\%(RecursiveDir)" SkipUnchangedFiles="true" />
   </Target>
 </Project>

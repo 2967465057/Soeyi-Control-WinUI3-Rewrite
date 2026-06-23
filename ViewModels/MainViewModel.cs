@@ -505,18 +505,22 @@ public class MainViewModel : ObservableObject, IDisposable
 	{
 		try
 		{
+			// Ensure libusb0 driver is installed before attempting to connect
+			StatusMessage = T("installingDriver");
+			bool driverOk = await Task.Run(() => DriverService.InstallDriver());
+			if (driverOk)
+				Debug.WriteLine("Driver install: OK");
+			else
+				Debug.WriteLine("Driver install: failed or skipped");
+
 			int r = await Task.Run(() => _deviceService.Start());
 			IsDriverRunning = r >= 0;
 			StatusMessage = (IsDriverRunning ? T("driverRunning") : $"Start failed: {r}");
 		}
 		catch (Exception ex)
 		{
-			Exception ex2 = ex;
-			Exception ex3 = ex2;
-			Exception ex4 = ex3;
-			Exception ex5 = ex4;
-			StatusMessage = "Error: " + ex5.Message;
-			Debug.WriteLine("Driver start failed: " + ex5.Message);
+			StatusMessage = "Error: " + ex.Message;
+			Debug.WriteLine("Driver start failed: " + ex.Message);
 		}
 	}
 
@@ -786,6 +790,7 @@ public class MainViewModel : ObservableObject, IDisposable
 				["quality"] = "Quality",
 				["language"] = "Language",
 				["devices"] = "Devices",
+				["installingDriver"] = "Installing driver…",
 				["driverRunning"] = "Driver Running",
 				["driverStopped"] = "Driver Stopped",
 				["brightness"] = "Brightness",

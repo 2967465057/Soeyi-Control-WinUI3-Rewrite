@@ -1,46 +1,57 @@
-﻿# Build outputs
-bin/
-obj/
-publish/
-msix-layout/
+## .NET / Visual Studio
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+.vs/
 *.user
 *.suo
-*.msix
-*.appx
+*.userosscache
+*.sln.docstates
+artifacts/
+
+# Build logs
+[Ll]og/
+[Ll]ogs/
+*.log
+*.binlog
+
+# Test results
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
 
 # NuGet
-**/packages/
+*.nupkg
+*.snupkg
+*.nuget.props
+*.nuget.targets
+project.lock.json
 
-# IDE
-.vs/
-.idea/
-*.sln.DotSettings
-
-# Certificates (generate locally)
-*.pfx
-*.cer
-*.p12
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs
-*.log
-logs/
-soeyi-crash.log
-
-# Native DLLs flagged by secret scanning (false positive)
-NativeDlls/x64/cpuidsdk.dll
-
-# OpenClaw workspace (not part of project)
-.openclaw/
-.opencode/
-AGENTS.md
-SOUL.md
-TOOLS.md
-config/
-*.ps1
-
-# MSIX packages (use GitHub Releases)
+# MSIX packaging output
+AppPackages/
+BundleArtifacts/
 *.msix
+*.msixupload
+*.appx
+*.appxbundle
+*.appxupload
+
+# Publish output
+publish/
+*.pubxml
+PublishScripts/
+
+# Code analysis and tooling
+_ReSharper*/
+*.DotSettings.user
+*.dotCover
+.idea/
+
+# Generated files
+Generated\ Files/
+*_wpftmp.csproj
+
+# Excluded - GitHub push protection false positive (binary DLL data)
+NativeDlls/x64/cpuidsdk.dll
