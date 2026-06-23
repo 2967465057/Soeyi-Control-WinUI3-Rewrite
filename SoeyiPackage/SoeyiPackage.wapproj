@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <WapProjPath Condition="'$(WapProjPath)'==''">$(MSBuildExtensionsPath)\Microsoft\DesktopBridge\</WapProjPath>
+  </PropertyGroup>
+  <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.props" />
+  <PropertyGroup>
+    <ProjectGuid>{A1B2C3D4-E5F6-7890-ABCD-EF1234567890}</ProjectGuid>
+    <TargetPlatformVersion>10.0.19041.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <DefaultLanguage>zh-CN</DefaultLanguage>
+    <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
+    <EntryPointProjectUniqueName>..\SoeyiWinUI-v2.csproj</EntryPointProjectUniqueName>
+    <GenerateAppxPackageOnBuild>true</GenerateAppxPackageOnBuild>
+    <PackageCertificateThumbprint></PackageCertificateThumbprint>
+  </PropertyGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <SubType>Designer</SubType>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SoeyiWinUI-v2.csproj" />
+  </ItemGroup>
+  <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
+</Project>

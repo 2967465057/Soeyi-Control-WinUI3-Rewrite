@@ -1,0 +1,134 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>SoeyiWinUI_v2</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <UseWinUI>true</UseWinUI>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishTrimmed>false</PublishTrimmed>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-48_altform-lightunplated.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\AppIcon.ico" />
+    <Content Include="Assets\Soeyi32.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Soeyi64.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="nlog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\MSDISPLAYSDKWRRAPER.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\AicUsbDisplay.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\cpuidsdk.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\libusb0.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\LibreHardwareMonitorLib.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\Mono.Posix.NETStandard.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\HidSharp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\DiskInfoToolkit.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\RAMSPDToolkit-NDD.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\FanControl.IPC.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\Google.Protobuf.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\Grpc.Core.Api.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="NativeDlls\x64\GrpcDotNetNamedPipes.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="System.IO.Ports" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.9" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="LibreHardwareMonitorLib">
+      <HintPath>NativeDlls\x64\LibreHardwareMonitorLib.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Mono.Posix.NETStandard">
+      <HintPath>NativeDlls\x64\Mono.Posix.NETStandard.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="FanControl.IPC">
+      <HintPath>NativeDlls\x64\FanControl.IPC.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Grpc.Core.Api">
+      <HintPath>NativeDlls\x64\Grpc.Core.Api.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Google.Protobuf">
+      <HintPath>NativeDlls\x64\Google.Protobuf.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="GrpcDotNetNamedPipes">
+      <HintPath>NativeDlls\x64\GrpcDotNetNamedPipes.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <Target Name="CopyNativeDlls" AfterTargets="Build">
+    <Copy SourceFiles="NativeDlls\x64\MSDISPLAYSDKWRRAPER.dll;NativeDlls\x64\AicUsbDisplay.dll;NativeDlls\x64\cpuidsdk.dll;NativeDlls\x64\libusb0.dll;NativeDlls\x64\HidSharp.dll;NativeDlls\x64\DiskInfoToolkit.dll;NativeDlls\x64\RAMSPDToolkit-NDD.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

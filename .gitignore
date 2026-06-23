@@ -1,0 +1,43 @@
+﻿# Build outputs
+bin/
+obj/
+publish/
+msix-layout/
+*.user
+*.suo
+*.msix
+*.appx
+
+# NuGet
+**/packages/
+
+# IDE
+.vs/
+.idea/
+*.sln.DotSettings
+
+# Certificates (generate locally)
+*.pfx
+*.cer
+*.p12
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+soeyi-crash.log
+
+# Native DLLs flagged by secret scanning (false positive)
+NativeDlls/x64/cpuidsdk.dll
+
+# OpenClaw workspace (not part of project)
+.openclaw/
+.opencode/
+AGENTS.md
+SOUL.md
+TOOLS.md
+config/
+*.ps1
