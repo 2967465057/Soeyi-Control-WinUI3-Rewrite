@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
@@ -22,13 +22,13 @@
   </Dependencies>
 
   <Resources>
-    <Resource Language="x-generate"/>
+    <Resource Language="zh-CN"/><Resource Language="en-US"/><Resource Language="ja-JP"/><Resource Language="ko-KR"/>
   </Resources>
 
   <Applications>
     <Application Id="App"
-      Executable="$targetnametoken$.exe"
-      EntryPoint="$targetentrypoint$">
+      Executable="SoeyiWinUI-v2.exe"
+      EntryPoint="SoeyiWinUI_v2.App">
       <uap:VisualElements
         DisplayName="SOEYI WinUI"
         Description="USB Secondary Display Management"
