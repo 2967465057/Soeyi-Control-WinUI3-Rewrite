@@ -103,4 +103,4 @@ Add-AppxPackage SoeyiWinUI.msix
 
 ## 许可
 
-本项目基于原始 SOEYI 软件逆向工程重建，仅用于学习研究。原始软件版权归其作者所有。
+[MIT](LICENSE) © 2026 Zeagero

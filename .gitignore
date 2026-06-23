@@ -41,3 +41,6 @@ SOUL.md
 TOOLS.md
 config/
 *.ps1
+
+# MSIX packages (use GitHub Releases)
+*.msix
