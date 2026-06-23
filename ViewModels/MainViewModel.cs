@@ -507,7 +507,7 @@ public class MainViewModel : ObservableObject, IDisposable
 		{
 			// Ensure libusb0 driver is installed before attempting to connect
 			StatusMessage = T("installingDriver");
-			bool driverOk = await Task.Run(() => DriverService.InstallDriver());
+			bool driverOk = await Task.Run(() => DriverService.EnsureDeviceReady());
 			if (driverOk)
 				Debug.WriteLine("Driver install: OK");
 			else

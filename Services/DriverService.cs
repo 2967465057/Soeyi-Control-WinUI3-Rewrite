@@ -6,13 +6,13 @@ namespace SoeyiWinUI_v2.Services;
 
 /// <summary>
 /// Checks and installs the libusb0 kernel driver required for USB secondary display.
+/// Falls back to PnP device reset when driver catalog signature doesn't match.
 /// </summary>
 public static class DriverService
 {
     private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
     private const string DriverSysPath = @"C:\Windows\System32\drivers\libusb0.sys";
-    private const string DeviceId = @"USB\VID_33C3&PID_F101&MI_02";
 
     /// <summary>
     /// Returns true if the libusb0 kernel driver is installed on this system.
@@ -29,11 +29,11 @@ public static class DriverService
     }
 
     /// <summary>
-    /// Installs the libusb0 driver using DPInst64.exe.
-    /// Launches UAC prompt if not already elevated.
-    /// Returns true if installation succeeded.
+    /// Ensures the USB display is ready. Tries DPInst first, then PnP device reset as fallback.
+    /// Returns true if the device should be functional (driver installed OR device reset OK).
+    /// This is non-fatal — DLS serial path works even without the libusb kernel driver.
     /// </summary>
-    public static bool InstallDriver()
+    public static bool EnsureDeviceReady()
     {
         if (IsDriverInstalled())
         {
@@ -41,6 +41,30 @@ public static class DriverService
             return true;
         }
 
+        // Try DPInst (may need UAC, may fail due to catalog mismatch)
+        bool dpOk = TryInstallWithDpInst();
+
+        if (dpOk && IsDriverInstalled())
+        {
+            Logger.Info("DPInst succeeded, driver installed");
+            return true;
+        }
+
+        if (!dpOk)
+            Logger.Info("DPInst failed — falling back to PnP device reset");
+
+        // Fallback: reset USB serial device via PnP (fixes Error state after driver uninstall)
+        bool pnpOk = ResetUsbSerialDevice();
+        Logger.Info("PnP device reset: {0}", pnpOk ? "OK" : "failed");
+
+        // Return true — DLS serial path doesn't need libusb kernel driver,
+        // and PnP reset may have restored the COM port.
+        // Let DeviceService decide if it can connect.
+        return true;
+    }
+
+    private static bool TryInstallWithDpInst()
+    {
         var libusbDir = FindLibusbDir();
         if (libusbDir == null)
         {
@@ -63,35 +87,23 @@ public static class DriverService
             {
                 WorkingDirectory = libusbDir,
                 UseShellExecute = true,
-                Verb = "runas", // triggers UAC elevation
+                Verb = "runas",
                 WindowStyle = ProcessWindowStyle.Hidden
             };
 
             using var proc = Process.Start(psi);
             if (proc == null)
             {
-                Logger.Error("Driver install: failed to start process (UAC declined?)");
+                Logger.Error("Driver install: failed to start (UAC declined?)");
                 return false;
             }
 
-            proc.WaitForExit(120_000); // 2 min timeout
+            proc.WaitForExit(120_000);
             int exitCode = proc.ExitCode;
-            Logger.Info("Driver install: DPInst64 exit code = {0}", exitCode);
+            Logger.Info("Driver install: DPInst64 exit code = 0x{0:X}", exitCode);
 
             // DPInst returns 0 on success, 0x40000000+ on reboot needed
-            bool ok = exitCode == 0 || (exitCode & 0x40000000) != 0;
-
-            if (ok)
-            {
-                // Verify driver file was actually copied
-                Thread.Sleep(500);
-                bool installed = IsDriverInstalled();
-                Logger.Info("Driver install: verification = {0}", installed);
-                return installed;
-            }
-
-            Logger.Error("Driver install: DPInst64 failed (exit {0})", exitCode);
-            return false;
+            return exitCode == 0 || (exitCode & 0x40000000) != 0;
         }
         catch (Exception ex)
         {
@@ -101,23 +113,97 @@ public static class DriverService
     }
 
     /// <summary>
-    /// Returns the directory containing libusb driver files.
+    /// Resets the USB serial device (VID_33C3&PID_F101&MI_00) via PnP disable/enable cycle.
+    /// Fixes "Error" state that occurs after original driver is uninstalled.
     /// </summary>
+    private static bool ResetUsbSerialDevice()
+    {
+        try
+        {
+            // Find all child devices under VID_33C3&PID_F101
+            var psi = new ProcessStartInfo("pnputil", "/enum-devices /class Ports /connected")
+            {
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var proc = Process.Start(psi);
+            if (proc == null) return false;
+            string output = proc.StandardOutput.ReadToEnd();
+            proc.WaitForExit(5000);
+
+            // Find instance IDs matching our device
+            var lines = output.Split('\n');
+            List<string> deviceIds = new();
+            foreach (var line in lines)
+            {
+                if (line.Contains("VID_33C3", StringComparison.OrdinalIgnoreCase) ||
+                    line.Contains("VID_345F", StringComparison.OrdinalIgnoreCase))
+                {
+                    var match = System.Text.RegularExpressions.Regex.Match(line,
+                        @"USB\\VID_\w+&PID_\w+&MI_\w+\\.+?(?=\s*$|$)");
+                    if (match.Success)
+                        deviceIds.Add(match.Value.Trim());
+                }
+            }
+
+            if (deviceIds.Count == 0)
+            {
+                Logger.Info("PnP reset: no matching USB serial devices found");
+                return false;
+            }
+
+            foreach (var id in deviceIds)
+            {
+                Logger.Info("PnP reset: cycling {0}", id);
+                // Disable
+                var disable = new ProcessStartInfo("pnputil", $"/disable-device \"{id}\"")
+                {
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var dp = Process.Start(disable);
+                dp?.WaitForExit(8000);
+
+                Thread.Sleep(2000);
+
+                // Enable
+                var enable = new ProcessStartInfo("pnputil", $"/enable-device \"{id}\"")
+                {
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var ep = Process.Start(enable);
+                ep?.WaitForExit(8000);
+
+                Thread.Sleep(2000);
+            }
+
+            Logger.Info("PnP reset: cycled {0} device(s)", deviceIds.Count);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Error(ex, "PnP reset: exception");
+            return false;
+        }
+    }
+
     private static string? FindLibusbDir()
     {
         var baseDir = AppContext.BaseDirectory;
 
-        // Try: appDir\libusb
         var dir = Path.Combine(baseDir, "libusb");
         if (Directory.Exists(dir) && File.Exists(Path.Combine(dir, "DPInst64.exe")))
             return dir;
 
-        // Try: appDir\..\libusb (for dotnet run from project dir)
         dir = Path.GetFullPath(Path.Combine(baseDir, "..", "libusb"));
         if (Directory.Exists(dir) && File.Exists(Path.Combine(dir, "DPInst64.exe")))
             return dir;
 
-        // Try: appDir\..\..\..\..\libusb (for Debug/netX/win-x64 nesting)
         dir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "..", "libusb"));
         if (Directory.Exists(dir) && File.Exists(Path.Combine(dir, "DPInst64.exe")))
             return dir;
